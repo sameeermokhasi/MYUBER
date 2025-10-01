@@ -1,22 +1,17 @@
-from fastapi import APIRouter, HTTPException
-from datetime import datetime
-from ..models.schemas import PingRequest, PingResponse
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
 
+# Define the Pydantic models directly in this file
+class PingRequest(BaseModel):
+    input: str = Field(..., example="test")
+
+class PingResponse(BaseModel):
+    output: str = Field(..., example="test")
+
+# Create the router
 router = APIRouter()
 
-@router.post("/ping", response_model=PingResponse)
-async def ping_endpoint(request: PingRequest):
-    """
-    Ping endpoint that returns pong when data is 'ping'
-    """
-    # Fixed: correct condition check
-    if request.data == "ping":
-        return PingResponse(
-            message="pong",
-            timestamp=datetime.now().isoformat()
-        )
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid data. Expected 'ping'"
-        )
+@router.post("/ping")
+async def ping(request: PingRequest) -> PingResponse:
+    """Responds with the same message it received."""
+    return PingResponse(output=request.input)
