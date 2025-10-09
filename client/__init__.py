@@ -1,2 +1,0 @@
-# MYUBER Client Package
-
