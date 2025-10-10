@@ -2,9 +2,9 @@ import psycopg
 from psycopg.rows import dict_row
 
 # Database configuration - UPDATE YOUR PASSWORD!
-DB_NAME = "mini_uber_db"
+DB_NAME = "MYUBER_db"
 DB_USER = "postgres"
-DB_PASS = "Samehada@1234"  # ⚠️ CHANGE THIS
+DB_PASS = "0987"  # ⚠️ CHANGE THIS
 DB_HOST = "localhost"
 DB_PORT = "5432"
 

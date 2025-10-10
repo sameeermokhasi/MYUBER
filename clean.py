@@ -3,9 +3,9 @@ from psycopg import sql
 import sys
 
 # Database configuration
-DB_NAME = "mini_uber_db"
+DB_NAME = "MYUBER_db"
 DB_USER = "postgres"
-DB_PASS = "Venkatraman123"
+DB_PASS = "0987" # Make sure this is your actual password
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
@@ -69,9 +69,8 @@ def setup_schema():
         return False
 
 def main():
-    print("🚗 Mini Uber Clean Database Setup")
+    print("🚗 MYUBER Clean Database Setup")
     print("=" * 50)
-    # Simplified main function, assumes database exists
     if not setup_schema():
         sys.exit(1)
     print("\n🎉 Database is clean and ready for registrations!")

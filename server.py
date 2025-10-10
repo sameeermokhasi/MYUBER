@@ -9,11 +9,11 @@ app = Flask(__name__)
 CORS(app)
 
 # --- Database Configuration ---
-DB_NAME = "myuber_db"
+DB_NAME = "MYUBER_db"
 DB_USER = "postgres"
-DB_PASS = "Venkatesh431971"
+DB_PASS = "0987"  # 👈 *** USE THE PASSWORD THAT WORKED FOR setup_database.py ***
 DB_HOST = "localhost"
-DB_PORT = "5433"
+DB_PORT = "5432"
 
 def get_db_connection():
     """Establishes a robust connection to the PostgreSQL database."""
