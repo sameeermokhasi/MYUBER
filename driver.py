@@ -8,7 +8,7 @@ CORS(app)
 
 SERVER_URL = 'http://localhost:3000'
 
-# --- "STREET RIDER" DARK MODE INTERFACE WITH MAP PANEL ---
+# --- "STREET RIDER" DARK MODE INTERFACE WITH MAP PANEL ----
 DRIVER_DASHBOARD_HTML = '''
 <!DOCTYPE html>
 <html lang="en">

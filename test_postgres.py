@@ -1,7 +1,7 @@
 import psycopg
 from psycopg.rows import dict_row
 
-# Database configuration - UPDATE YOUR PASSWORD!
+# Database configuration - UPDATE YOUR PASSWORD!!
 DB_NAME = "MYUBER_db"
 DB_USER = "postgres"
 DB_PASS = "0987"  # ⚠️ CHANGE THIS

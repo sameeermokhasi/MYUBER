@@ -8,7 +8,7 @@ import traceback # Import the traceback module for better error logging
 app = Flask(__name__)
 CORS(app)
 
-# --- Database Configuration ---
+# --- Database Configuration ----
 DB_NAME = "MYUBER_db"
 DB_USER = "postgres"
 DB_PASS = "0987"  # 👈 *** USE THE PASSWORD THAT WORKED FOR setup_database.py ***

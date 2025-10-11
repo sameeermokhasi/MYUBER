@@ -5,7 +5,7 @@ import sys
 # Database configuration
 DB_NAME = "MYUBER_db"
 DB_USER = "postgres"
-DB_PASS = "0987" # Make sure this is your actual password
+DB_PASS = "0987" # Make sure this is your actual password for the postgres user 
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
