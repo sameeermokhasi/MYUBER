@@ -426,6 +426,37 @@ def update_driver_status(driver_id):
         traceback.print_exc()
         return jsonify({'success': False, 'error': 'Database error', 'details': str(e)}), 500
 
+# --- NEW ADMIN ENDPOINT ---
+@app.route('/api/admin/all-data', methods=['GET'])
+def get_all_data():
+    """Fetches all users, drivers, and rides for the admin panel."""
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(row_factory=dict_row) as cur:
+                # Fetch all users
+                cur.execute("SELECT id, name, email, phone FROM users ORDER BY id DESC;")
+                users = cur.fetchall()
+                
+                # Fetch all drivers
+                cur.execute("SELECT id, name, vehicle_details, online_status FROM drivers ORDER BY id DESC;")
+                drivers = cur.fetchall()
+
+                # Fetch all rides
+                cur.execute("SELECT id, user_id, driver_id, source_location, dest_location, fare, status FROM rides ORDER BY created_at DESC;")
+                rides = cur.fetchall()
+                
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'users': users,
+                        'drivers': drivers,
+                        'rides': rides
+                    }
+                })
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': 'Database error while fetching admin data', 'details': str(e)}), 500
+    
 if __name__ == '__main__':
     print('=' * 60)
     print('🚗 Mini Uber Core Server')

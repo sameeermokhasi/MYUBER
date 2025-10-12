@@ -615,7 +615,7 @@ def proxy_get_completed_rides(driver_id):
         return jsonify({'success': False, 'error': 'Server connection failed'}), 503
 
 if __name__ == '__main__':
-    port = 5001
+    port = 8000
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     print(f'Driver Portal running at http://localhost:{port}')
