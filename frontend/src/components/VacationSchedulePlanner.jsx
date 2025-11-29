@@ -67,9 +67,17 @@ export default function VacationSchedulePlanner() {
         activities: activities.map(a => `${a.time} - ${a.location}: ${a.description}`).join('; ')
       }
 
-      // Create vacation booking
+      // Create vacation booking with proper field names
       const vacationData = {
-        ...tripDetails,
+        destination: tripDetails.destination,
+        hotel_name: tripDetails.hotelName,
+        hotel_address: tripDetails.hotelAddress,
+        start_date: new Date(tripDetails.startDate).toISOString(),
+        end_date: new Date(tripDetails.endDate).toISOString(),
+        vehicle_type: tripDetails.vehicleType,
+        passengers: tripDetails.passengers,
+        ride_included: tripDetails.rideIncluded,
+        hotel_included: true, // Always true since hotel is handled by rider
         schedule: JSON.stringify(schedule),
         flight_details: JSON.stringify(flightDetails),
         meal_preferences: JSON.stringify(mealTimings),

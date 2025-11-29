@@ -97,6 +97,16 @@ export const userService = {
       throw error
     }
   },
+
+  async updateUserProfile(userData) {
+    const response = await api.patch('/users/me', userData)
+    return response.data
+  },
+
+  async resetConsecutiveCancellations() {
+    const response = await api.patch('/users/me/reset-cancellations')
+    return response.data
+  },
 }
 
 export const adminService = {

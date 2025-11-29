@@ -48,18 +48,16 @@ class DriverProfile(Base):
     __tablename__ = "driver_profiles"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
     license_number = Column(String, unique=True, nullable=False)
     vehicle_type = Column(Enum(VehicleType), default=VehicleType.ECONOMY)
     vehicle_model = Column(String, nullable=True)
     vehicle_plate = Column(String, nullable=True)
-    vehicle_color = Column(String, nullable=True)
-    rating = Column(Float, default=5.0)
+    rating = Column(Float, default=0.0)
     total_rides = Column(Integer, default=0)
-    is_available = Column(Boolean, default=True)
+    is_available = Column(Boolean, default=False)
     current_lat = Column(Float, nullable=True)
     current_lng = Column(Float, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
     user = relationship("User", back_populates="driver_profile")

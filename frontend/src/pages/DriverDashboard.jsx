@@ -60,6 +60,12 @@ export default function DriverDashboard() {
         console.log("Initializing driver...");
         
         // First, make sure driver is available
+        // Get current user status first to check availability
+        const currentUser = await userService.getCurrentUser();
+        console.log("Current user status:", currentUser);
+        
+        // Always set driver to available when dashboard loads
+        console.log("Setting driver to available");
         const updatedUser = await userService.toggleDriverAvailability();
         console.log("Driver availability updated:", updatedUser);
         setIsOnline(updatedUser.driver_profile?.is_available || false);
@@ -80,6 +86,8 @@ export default function DriverDashboard() {
             },
             (error) => {
               console.warn('Failed to get location:', error);
+              // Even if we can't get location, we'll still try to load rides
+              loadRides();
             },
             {
               enableHighAccuracy: true,
@@ -87,11 +95,15 @@ export default function DriverDashboard() {
               maximumAge: 60000
             }
           );
+        } else {
+          // If geolocation is not available, still load rides
+          loadRides();
         }
       } catch (error) {
         console.error("Failed to initialize driver:", error);
         // Even if we can't set availability, we'll still try to load rides
-        setIsOnline(false);
+        setIsOnline(true); // Set to true to allow ride loading
+        loadRides();
       }
     };
 
@@ -238,6 +250,8 @@ export default function DriverDashboard() {
       ws.onopen = () => {
         console.log('Connected to WebSocket');
         reconnectAttempts = 0; // Reset on successful connection
+        // Load rides when WebSocket connects
+        loadRides();
       };
 
       ws.onmessage = (event) => {
@@ -315,6 +329,10 @@ export default function DriverDashboard() {
             console.log("Processing vacation status update");
             // Refresh vacations when status updates
             loadRides();
+          } else if (data.type === 'ride_removed') {
+            console.log("Processing ride removal");
+            // Remove the ride from available rides list
+            setLocalRides(prev => prev.filter(ride => ride.id !== data.ride_id));
           } else {
             // Handle any other message types by refreshing rides
             console.log("Unknown message type, refreshing rides");
@@ -405,12 +423,20 @@ export default function DriverDashboard() {
       } catch (error) {
         console.error("Error fetching rides, retrying...", error);
         // Retry once
-        const results = await Promise.all([
-          rideService.getAvailableRides(),
-          vacationService.getAvailableVacations(),
-          rideService.getRides()
-        ]);
-        [localAvailable, vacationAvailable, myActive] = results;
+        try {
+          const results = await Promise.all([
+            rideService.getAvailableRides(),
+            vacationService.getAvailableVacations(),
+            rideService.getRides()
+          ]);
+          [localAvailable, vacationAvailable, myActive] = results;
+        } catch (retryError) {
+          console.error("Retry failed, using empty arrays", retryError);
+          // Use empty arrays as fallback
+          localAvailable = [];
+          vacationAvailable = [];
+          myActive = [];
+        }
       }
       
       console.log("Local available rides:", localAvailable);
@@ -428,16 +454,17 @@ export default function DriverDashboard() {
       setVacationRides(vacationAvailable);
       setMyRides(assignedRides);
       
-      setLoading(false);
+      console.log("=== FINISHED LOADING RIDES ===");
     } catch (error) {
       console.error("Failed to load rides:", error);
-      // Set empty arrays on error to avoid showing stale data
+      // Set empty arrays on error to prevent UI issues
       setLocalRides([]);
       setVacationRides([]);
       setMyRides([]);
+    } finally {
       setLoading(false);
     }
-  }
+  };
 
   // Map component to show rider location and route
   const RiderLocationMap = ({ ride, driverLoc }) => {
@@ -599,6 +626,16 @@ export default function DriverDashboard() {
   }
 
   const acceptRide = async (rideId) => {
+    // Check if driver is already on a ride
+    const activeRides = myRides.filter(ride => 
+      ride.status === 'accepted' || ride.status === 'in_progress'
+    );
+    
+    if (activeRides.length > 0) {
+      alert('Cannot accept new ride. You are already on a ride.');
+      return;
+    }
+    
     try {
       console.log("Accepting ride:", rideId);
       const updatedRide = await rideService.updateRide(rideId, { status: 'accepted' });
@@ -731,6 +768,7 @@ export default function DriverDashboard() {
       }
     } catch (error) {
       console.error(`Failed to accept ${type} ride:`, error);
+      alert(`Failed to accept ${type}. Please try again.`);
       // Show error notification
       if (Notification.permission === 'granted') {
         new Notification(`Error Accepting ${type === 'vacation' ? 'Vacation' : 'Ride'}`, {

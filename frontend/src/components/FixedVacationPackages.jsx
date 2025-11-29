@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Plane, MapPin, Calendar, Users, DollarSign, Star, Clock } from 'lucide-react';
-import { vacationService } from '../services/api';
+import { MapPin, Calendar, Star } from 'lucide-react';
+import { vacationService, vacationSchedulerService } from '../services/api';
 
 const FIXED_PACKAGES = [
   {
@@ -10,41 +10,46 @@ const FIXED_PACKAGES = [
     days: 3,
     nights: 2,
     price: 8500,
-    image: "https://images.unsplash.com/photo-1565622975874-0c730c00b5e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
     description: "Experience the spiritual and adventurous side of Gokarna with this 3-day package",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "7:00 AM", activity: "Pickup from Hubli/Dharwad", icon: "🚗" },
-          { time: "8:30 AM", activity: "Breakfast at local restaurant", icon: "🍳" },
-          { time: "10:00 AM", activity: "Visit Mahabaleshwar Temple", icon: "🛕" },
-          { time: "11:30 AM", activity: "Beach and water activities at Om Beach", icon: "🏖️" },
-          { time: "2:00 PM", activity: "Lunch at beachside restaurant", icon: "🍽️" },
-          { time: "4:00 PM", activity: "Visit hidden beaches (Kudle, Paradise, Half Moon)", icon: "🌊" },
-          { time: "6:00 PM", activity: "Ride to Honnavar", icon: "🚗" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Pickup from Hubli/Dharwad" },
+          { time: "8:30 AM", activity: "Breakfast at local restaurant" },
+          { time: "10:00 AM", activity: "Visit Mahabaleshwar Temple" },
+          { time: "11:30 AM", activity: "Beach and water activities at Om Beach" },
+          { time: "2:00 PM", activity: "Lunch at beachside restaurant" },
+          { time: "4:00 PM", activity: "Visit hidden beaches (Kudle, Paradise, Half Moon)" },
+          { time: "6:00 PM", activity: "Ride to Honnavar" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "6:00 AM", activity: "Breakfast and visit Murdeshwara Shiva Temple", icon: "🛕" },
-          { time: "9:00 AM", activity: "Visit famous beach and water activities", icon: "🏖️" },
-          { time: "11:00 AM", activity: "Water sports (optional)", icon: "🏄" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Back to Honnavar", icon: "🚗" },
-          { time: "5:00 PM", activity: "Honnavar backwaters boating", icon: "🚤" },
-          { time: "7:00 PM", activity: "Tea and snacks", icon: "🍵" },
-          { time: "9:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "6:00 AM", activity: "Breakfast and visit Murdeshwara Shiva Temple" },
+          { time: "9:00 AM", activity: "Visit famous beach and water activities" },
+          { time: "11:00 AM", activity: "Water sports (optional)" },
+          { time: "1:00 PM", activity: "Lunch" },
+          { time: "3:00 PM", activity: "Back to Honnavar" },
+          { time: "5:00 PM", activity: "Honnavar backwaters boating" },
+          { time: "7:00 PM", activity: "Tea and snacks" },
+          { time: "9:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "6:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "8:00 AM", activity: "Check-out and back to Hubli", icon: "🚗" },
-          { time: "12:00 PM", activity: "Arrive in Hubli", icon: "🏁" }
+          { time: "6:00 AM", activity: "Breakfast" },
+          { time: "8:00 AM", activity: "Check-out and back to Hubli" },
+          { time: "12:00 PM", activity: "Arrive in Hubli" }
         ]
       }
     ],
@@ -70,48 +75,53 @@ const FIXED_PACKAGES = [
     days: 4,
     nights: 3,
     price: 12500,
-    image: "https://images.unsplash.com/photo-1566249245911-70f3c9b4b6d0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
     description: "Explore the beaches, nightlife, and heritage of Goa",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "8:00 AM", activity: "Pickup from Mumbai/Bangalore", icon: "🚗" },
-          { time: "12:00 PM", activity: "Arrive in Goa, check-in at hotel", icon: "🏨" },
-          { time: "1:00 PM", activity: "Welcome lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Visit Old Goa churches", icon: "⛪" },
-          { time: "6:00 PM", activity: "Sunset at Calangute Beach", icon: "🌅" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "8:00 AM", activity: "Pickup from Mumbai/Bangalore" },
+          { time: "12:00 PM", activity: "Arrive in Goa, check-in at hotel" },
+          { time: "1:00 PM", activity: "Welcome lunch" },
+          { time: "3:00 PM", activity: "Visit Old Goa churches" },
+          { time: "6:00 PM", activity: "Sunset at Calangute Beach" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Dudhsagar Waterfalls trek", icon: " thác" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Anjuna Beach and flea market", icon: "🛍️" },
-          { time: "6:00 PM", activity: "Water sports at Baga Beach", icon: "🏄" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Dudhsagar Waterfalls trek" },
+          { time: "1:00 PM", activity: "Lunch" },
+          { time: "3:00 PM", activity: "Anjuna Beach and flea market" },
+          { time: "6:00 PM", activity: "Water sports at Baga Beach" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "10:00 AM", activity: "Cruise on Mandovi River", icon: "🚢" },
-          { time: "1:00 PM", activity: "Lunch on cruise", icon: "🍽️" },
-          { time: "4:00 PM", activity: "Shopping at Panjim", icon: "🛍️" },
-          { time: "7:00 PM", activity: "Casino night (optional)", icon: "🎲" },
-          { time: "10:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "10:00 AM", activity: "Cruise on Mandovi River" },
+          { time: "1:00 PM", activity: "Lunch on cruise" },
+          { time: "4:00 PM", activity: "Shopping at Panjim" },
+          { time: "7:00 PM", activity: "Casino night (optional)" },
+          { time: "10:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 4,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Relax at Miramar Beach", icon: "🏖️" },
-          { time: "12:00 PM", activity: "Check-out and back to origin", icon: "🚗" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Relax at Miramar Beach" },
+          { time: "12:00 PM", activity: "Check-out and back to origin" }
         ]
       }
     ],
@@ -138,41 +148,46 @@ const FIXED_PACKAGES = [
     days: 3,
     nights: 2,
     price: 9500,
-    image: "https://images.unsplash.com/photo-1587474260584-1365e406153e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
     description: "Discover the rich history and culture of India's capital",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "8:00 AM", activity: "Pickup from airport/railway station", icon: "🚗" },
-          { time: "9:00 AM", activity: "Visit Red Fort", icon: "🏰" },
-          { time: "11:00 AM", activity: "Explore Chandni Chowk", icon: "🛍️" },
-          { time: "1:00 PM", activity: "Lunch at Paranthe Wali Gali", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Visit Jama Masjid", icon: "🕌" },
-          { time: "5:00 PM", activity: "Drive through Rajpath", icon: "🚗" },
-          { time: "7:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "8:00 AM", activity: "Pickup from airport/railway station" },
+          { time: "9:00 AM", activity: "Visit Red Fort" },
+          { time: "11:00 AM", activity: "Explore Chandni Chowk" },
+          { time: "1:00 PM", activity: "Lunch at Paranthe Wali Gali" },
+          { time: "3:00 PM", activity: "Visit Jama Masjid" },
+          { time: "5:00 PM", activity: "Drive through Rajpath" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit Qutub Minar", icon: "🕌" },
-          { time: "11:00 AM", activity: "Lotus Temple", icon: "🏛️" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "India Gate and Rashtrapati Bhavan", icon: "🏛️" },
-          { time: "5:00 PM", activity: "Shopping at Connaught Place", icon: "🛍️" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Qutub Minar" },
+          { time: "11:00 AM", activity: "Lotus Temple" },
+          { time: "1:00 PM", activity: "Lunch" },
+          { time: "3:00 PM", activity: "India Gate and Rashtrapati Bhavan" },
+          { time: "5:00 PM", activity: "Shopping at Connaught Place" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit Humayun's Tomb", icon: "🏰" },
-          { time: "11:00 AM", activity: "Akshardham Temple", icon: "🛕" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Check-out and departure", icon: "🚗" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Humayun's Tomb" },
+          { time: "11:00 AM", activity: "Akshardham Temple" },
+          { time: "1:00 PM", activity: "Lunch" },
+          { time: "3:00 PM", activity: "Check-out and departure" }
         ]
       }
     ],
@@ -197,50 +212,55 @@ const FIXED_PACKAGES = [
     days: 4,
     nights: 3,
     price: 11500,
-    image: "https://images.unsplash.com/photo-1596422375124-7b49c3d310ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
     description: "Experience the beauty of snow-capped mountains and adventure activities",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "7:00 AM", activity: "Pickup from Chandigarh/Delhi", icon: "🚗" },
-          { time: "1:00 PM", activity: "Arrive in Manali, check-in at hotel", icon: "🏨" },
-          { time: "2:00 PM", activity: "Welcome lunch", icon: "🍽️" },
-          { time: "4:00 PM", activity: "Visit Hadimba Temple", icon: "🛕" },
-          { time: "6:00 PM", activity: "Mall Road and local market", icon: "🛍️" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Pickup from Chandigarh/Delhi" },
+          { time: "1:00 PM", activity: "Arrive in Manali, check-in at hotel" },
+          { time: "2:00 PM", activity: "Welcome lunch" },
+          { time: "4:00 PM", activity: "Visit Hadimba Temple" },
+          { time: "6:00 PM", activity: "Mall Road and local market" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Sightseeing tour of Manali", icon: "🏔️" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Adventure activities (paragliding, zorbing)", icon: "🎈" },
-          { time: "6:00 PM", activity: "Visit Vashist Hot Springs", icon: "♨️" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Sightseeing tour of Manali" },
+          { time: "1:00 PM", activity: "Lunch" },
+          { time: "3:00 PM", activity: "Adventure activities (paragliding, zorbing)" },
+          { time: "6:00 PM", activity: "Visit Vashist Hot Springs" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "8:00 AM", activity: "Drive to Solang Valley", icon: "🚗" },
-          { time: "10:00 AM", activity: "Adventure sports (skiing, snowboarding)", icon: "⛷️" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Rope ways and sightseeing", icon: "🏔️" },
-          { time: "6:00 PM", activity: "Back to Manali", icon: "🚗" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "8:00 AM", activity: "Drive to Solang Valley" },
+          { time: "10:00 AM", activity: "Adventure sports (skiing, snowboarding)" },
+          { time: "1:00 PM", activity: "Lunch" },
+          { time: "3:00 PM", activity: "Rope ways and sightseeing" },
+          { time: "6:00 PM", activity: "Back to Manali" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 4,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit Rohtang Pass (weather permitting)", icon: "🏔️" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Check-out and departure", icon: "🚗" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Rohtang Pass (weather permitting)" },
+          { time: "1:00 PM", activity: "Lunch" },
+          { time: "3:00 PM", activity: "Check-out and departure" }
         ]
       }
     ],
@@ -266,63 +286,68 @@ const FIXED_PACKAGES = [
     days: 5,
     nights: 4,
     price: 14500,
-    image: "https://images.unsplash.com/photo-1561821398-a0ab178e1108?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
     description: "Experience the serene backwaters, beaches, and culture of God's Own Country",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "8:00 AM", activity: "Pickup from Kochi Airport", icon: "🚗" },
-          { time: "10:00 AM", activity: "Visit Fort Kochi and Chinese Fishing Nets", icon: "🎣" },
-          { time: "12:00 PM", activity: "Lunch at local restaurant", icon: "🍽️" },
-          { time: "2:00 PM", activity: "Visit St. Francis Church", icon: "⛪" },
-          { time: "4:00 PM", activity: "Drive to Alleppey", icon: "🚗" },
-          { time: "7:00 PM", activity: "Check-in at houseboat", icon: "🏠" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay on houseboat", icon: "🍽️" }
+          { time: "8:00 AM", activity: "Pickup from Kochi Airport" },
+          { time: "10:00 AM", activity: "Visit Fort Kochi and Chinese Fishing Nets" },
+          { time: "12:00 PM", activity: "Lunch at local restaurant" },
+          { time: "2:00 PM", activity: "Visit St. Francis Church" },
+          { time: "4:00 PM", activity: "Drive to Alleppey" },
+          { time: "7:00 PM", activity: "Check-in at houseboat" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay on houseboat" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "6:00 AM", activity: "Morning cruise through backwaters", icon: "🚤" },
-          { time: "9:00 AM", activity: "Breakfast on houseboat", icon: "🍳" },
-          { time: "11:00 AM", activity: "Visit local village and coir factory", icon: "🏭" },
-          { time: "1:00 PM", activity: "Lunch on houseboat", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Continue backwater cruise", icon: "🚤" },
-          { time: "6:00 PM", activity: "Disembark and drive to Kovalam", icon: "🚗" },
-          { time: "9:00 PM", activity: "Dinner and overnight stay at beach resort", icon: "🏨" }
+          { time: "6:00 AM", activity: "Morning cruise through backwaters" },
+          { time: "9:00 AM", activity: "Breakfast on houseboat" },
+          { time: "11:00 AM", activity: "Visit local village and coir factory" },
+          { time: "1:00 PM", activity: "Lunch on houseboat" },
+          { time: "3:00 PM", activity: "Continue backwater cruise" },
+          { time: "6:00 PM", activity: "Disembark and drive to Kovalam" },
+          { time: "9:00 PM", activity: "Dinner and overnight stay at beach resort" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Relax at Kovalam Beach", icon: "🏖️" },
-          { time: "12:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "2:00 PM", activity: "Ayurvedic massage therapy", icon: "💆" },
-          { time: "5:00 PM", activity: "Sunset view at Lighthouse Beach", icon: "🌅" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Kovalam Beach" },
+          { time: "11:00 AM", activity: "Lunch at beachside restaurant" },
+          { time: "1:00 PM", activity: "Visit Napier Museum" },
+          { time: "3:00 PM", activity: "Back to Kochi" },
+          { time: "6:00 PM", activity: "Dinner and overnight stay at hotel" }
         ]
       },
       {
         day: 4,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Drive to Munnar", icon: "🚗" },
-          { time: "2:00 PM", activity: "Arrive in Munnar, check-in at hotel", icon: "🏨" },
-          { time: "3:00 PM", activity: "Visit tea plantations", icon: "🌱" },
-          { time: "5:00 PM", activity: "Tea tasting at factory", icon: "🍵" },
-          { time: "7:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Mattupetty Dam" },
+          { time: "11:00 AM", activity: "Lunch at local restaurant" },
+          { time: "1:00 PM", activity: "Visit Ernakulam" },
+          { time: "3:00 PM", activity: "Shopping at Lulu Mall" },
+          { time: "6:00 PM", activity: "Dinner and overnight stay at hotel" }
         ]
       },
       {
         day: 5,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit Echo Point and Kundala Lake", icon: "🏞️" },
-          { time: "12:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "2:00 PM", activity: "Check-out and departure to Kochi", icon: "🚗" },
-          { time: "5:00 PM", activity: "Arrive in Kochi for onward journey", icon: "🏁" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Athirappilly Falls" },
+          { time: "11:00 AM", activity: "Lunch at local restaurant" },
+          { time: "1:00 PM", activity: "Visit Cherai Beach" },
+          { time: "3:00 PM", activity: "Check-out and departure" }
         ]
       }
     ],
@@ -330,237 +355,203 @@ const FIXED_PACKAGES = [
       "5 days, 4 nights accommodation",
       "All meals as per itinerary",
       "Transportation in AC vehicle",
-      "Houseboat stay with all meals",
+      "Houseboat stay",
       "Sightseeing as per itinerary",
       "Driver allowance and fuel"
     ],
     excludes: [
       "Personal expenses",
       "Entry fees to attractions",
-      "Ayurvedic treatments (extra cost)",
+      "Adventure sports (extra cost)",
       "GST (5%)"
     ]
   },
   {
     id: 6,
-    name: "Leh Ladakh Adventure",
-    destination: "Leh Ladakh, Jammu & Kashmir",
-    days: 7,
-    nights: 6,
-    price: 25000,
-    image: "https://images.unsplash.com/photo-1590475104315-4a74a96e15cc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    description: "Experience the high-altitude desert and Buddhist culture of Ladakh",
+    name: "Jaipur Royal Experience",
+    destination: "Jaipur, Rajasthan",
+    days: 4,
+    nights: 3,
+    price: 13500,
+    images: [
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
+    description: "Experience the royal heritage and majestic forts of Rajasthan",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "Arrival", activity: "Arrive at Leh Airport, transfer to hotel", icon: "🏨" },
-          { time: "Rest", activity: "Rest for acclimatization", icon: "😴" },
-          { time: "Evening", activity: "Local market visit", icon: "🛍️" },
-          { time: "Night", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "8:00 AM", activity: "Pickup from Delhi" },
+          { time: "12:00 PM", activity: "Arrive in Jaipur, check-in at hotel" },
+          { time: "1:00 PM", activity: "Welcome lunch" },
+          { time: "3:00 PM", activity: "Visit Amber Fort" },
+          { time: "6:00 PM", activity: "Evening at Chokhi Dhani Village Resort" },
+          { time: "9:00 PM", activity: "Dinner and cultural show" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "9:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "10:00 AM", activity: "Local sightseeing in Leh", icon: "🏔️" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Visit Shanti Stupa", icon: "🛕" },
-          { time: "6:00 PM", activity: "Shopping at Leh Market", icon: "🛍️" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit City Palace and Jantar Mantar" },
+          { time: "12:00 PM", activity: "Lunch at local restaurant" },
+          { time: "2:00 PM", activity: "Visit Hawa Mahal" },
+          { time: "4:00 PM", activity: "Shopping at Johari Bazaar" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "8:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Drive to Khardung La Pass", icon: "🚗" },
-          { time: "1:00 PM", activity: "Lunch at Khardung La", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Drive to Nubra Valley", icon: "🚗" },
-          { time: "6:00 PM", activity: "Check-in at hotel in Nubra Valley", icon: "🏨" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Nahargarh Fort" },
+          { time: "12:00 PM", activity: "Lunch at local restaurant" },
+          { time: "2:00 PM", activity: "Visit Jaigarh Fort" },
+          { time: "4:00 PM", activity: "Visit Albert Hall Museum" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 4,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit Diskit Monastery", icon: "🛕" },
-          { time: "12:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "2:00 PM", activity: "Camel safari in Hunder Sand Dunes", icon: "🐫" },
-          { time: "6:00 PM", activity: "Back to hotel", icon: "🏨" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
-        ]
-      },
-      {
-        day: 5,
-        schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Drive to Pangong Lake", icon: "🚗" },
-          { time: "2:00 PM", activity: "Arrive at Pangong Lake, check-in at camp", icon: "🏕️" },
-          { time: "3:00 PM", activity: "Lake sightseeing", icon: "🏞️" },
-          { time: "7:00 PM", activity: "Bonfire and dinner", icon: "🔥" },
-          { time: "Night", activity: "Overnight stay at camp", icon: "🏕️" }
-        ]
-      },
-      {
-        day: 6,
-        schedule: [
-          { time: "6:00 AM", activity: "Sunrise view at Pangong Lake", icon: "🌅" },
-          { time: "8:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "10:00 AM", activity: "Drive back to Leh", icon: "🚗" },
-          { time: "4:00 PM", activity: "Arrive in Leh, check-in at hotel", icon: "🏨" },
-          { time: "7:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
-        ]
-      },
-      {
-        day: 7,
-        schedule: [
-          { time: "8:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "10:00 AM", activity: "Visit Thiksey Monastery", icon: "🛕" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Departure to Leh Airport", icon: "🚗" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Galta Ji (Monkey Temple)" },
+          { time: "12:00 PM", activity: "Lunch at local restaurant" },
+          { time: "2:00 PM", activity: "Check-out and departure to Delhi" }
         ]
       }
     ],
     includes: [
-      "7 days, 6 nights accommodation",
+      "4 days, 3 nights accommodation",
       "All meals as per itinerary",
       "Transportation in AC vehicle",
-      "Inner Line Permits",
       "Sightseeing as per itinerary",
+      "Cultural show at Chokhi Dhani",
       "Driver allowance and fuel"
     ],
     excludes: [
       "Personal expenses",
-      "Entry fees to monasteries",
-      "Camel safari (extra cost)",
-      "Oxygen cylinder (if required)",
+      "Entry fees to monuments",
+      "Camera charges",
       "GST (5%)"
     ]
   },
   {
     id: 7,
-    name: "Kashmir Valley of Flowers",
-    destination: "Kashmir",
-    days: 5,
-    nights: 4,
-    price: 16500,
-    image: "https://images.unsplash.com/photo-1592592961218-10f193c1c2d0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    description: "Experience the natural beauty and houseboats of Kashmir",
+    name: "Mumbai City Tour",
+    destination: "Mumbai, Maharashtra",
+    days: 3,
+    nights: 2,
+    price: 8500,
+    images: [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
+    description: "Explore the bustling metropolis of Mumbai with its iconic landmarks",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "Arrival", activity: "Arrive at Srinagar Airport, transfer to hotel", icon: "🏨" },
-          { time: "2:00 PM", activity: "Shikara ride on Dal Lake", icon: "🛶" },
-          { time: "4:00 PM", activity: "Visit Mughal Gardens", icon: "🌺" },
-          { time: "7:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "9:00 AM", activity: "Pickup from airport/station" },
+          { time: "10:00 AM", activity: "Check-in at hotel" },
+          { time: "11:00 AM", activity: "Visit Gateway of India" },
+          { time: "12:00 PM", activity: "Lunch at local restaurant" },
+          { time: "2:00 PM", activity: "Visit Elephanta Caves (ferry ride)" },
+          { time: "6:00 PM", activity: "Back to Mumbai" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Drive to Pahalgam", icon: "🚗" },
-          { time: "1:00 PM", activity: "Lunch en route", icon: "🍽️" },
-          { time: "4:00 PM", activity: "Arrive in Pahalgam, check-in at hotel", icon: "🏨" },
-          { time: "6:00 PM", activity: "Local market visit", icon: "🛍️" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Marine Drive" },
+          { time: "10:00 AM", activity: "Visit Haji Ali Dargah" },
+          { time: "12:00 PM", activity: "Lunch at local restaurant" },
+          { time: "2:00 PM", activity: "Visit Chhatrapati Shivaji Terminus" },
+          { time: "4:00 PM", activity: "Visit Crawford Market" },
+          { time: "6:00 PM", activity: "Shopping at Colaba Causeway" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Sightseeing in Pahalgam", icon: "🏔️" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Visit Betaab Valley", icon: "🏞️" },
-          { time: "6:00 PM", activity: "Back to hotel", icon: "🏨" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
-        ]
-      },
-      {
-        day: 4,
-        schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Drive back to Srinagar", icon: "🚗" },
-          { time: "1:00 PM", activity: "Lunch en route", icon: "🍽️" },
-          { time: "4:00 PM", activity: "Check-in at houseboat on Dal Lake", icon: "🏠" },
-          { time: "6:00 PM", activity: "Evening at leisure", icon: "🕰️" },
-          { time: "8:00 PM", activity: "Dinner on houseboat", icon: "🍽️" },
-          { time: "Night", activity: "Overnight stay on houseboat", icon: "🏠" }
-        ]
-      },
-      {
-        day: 5,
-        schedule: [
-          { time: "7:00 AM", activity: "Breakfast on houseboat", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit Shankaracharya Temple", icon: "🛕" },
-          { time: "12:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "2:00 PM", activity: "Shopping at Lal Chowk", icon: "🛍️" },
-          { time: "4:00 PM", activity: "Departure to Srinagar Airport", icon: "🚗" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Siddhivinayak Temple" },
+          { time: "11:00 AM", activity: "Visit ISKCON Temple" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Check-out and departure" }
         ]
       }
     ],
     includes: [
-      "5 days, 4 nights accommodation",
+      "3 days, 2 nights accommodation",
       "All meals as per itinerary",
       "Transportation in AC vehicle",
-      "Shikara ride on Dal Lake",
+      "Ferry ride to Elephanta Caves",
       "Sightseeing as per itinerary",
       "Driver allowance and fuel"
     ],
     excludes: [
       "Personal expenses",
-      "Entry fees to attractions",
-      "Gondola ride (extra cost)",
+      "Entry fees to monuments",
+      "Camera charges",
       "GST (5%)"
     ]
   },
   {
     id: 8,
-    name: "Puducherry French Colony Tour",
-    destination: "Puducherry",
+    name: "Bangalore Tech & Gardens Tour",
+    destination: "Bangalore, Karnataka",
     days: 3,
     nights: 2,
     price: 7500,
-    image: "https://images.unsplash.com/photo-1598932932197-4bf5130cb094?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-    description: "Experience the French colonial charm and spiritual aura of Puducherry",
+    images: [
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
+    description: "Experience the garden city with its tech hubs and beautiful parks",
     itinerary: [
       {
         day: 1,
         schedule: [
-          { time: "8:00 AM", activity: "Pickup from Chennai", icon: "🚗" },
-          { time: "11:00 AM", activity: "Arrive in Puducherry, check-in at hotel", icon: "🏨" },
-          { time: "12:00 PM", activity: "Welcome lunch", icon: "🍽️" },
-          { time: "2:00 PM", activity: "Visit Sri Aurobindo Ashram", icon: "🛕" },
-          { time: "4:00 PM", activity: "Explore French Quarter", icon: "🏛️" },
-          { time: "6:00 PM", activity: "Visit Promenade Beach", icon: "🏖️" },
-          { time: "8:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "9:00 AM", activity: "Pickup from airport/station" },
+          { time: "10:00 AM", activity: "Check-in at hotel" },
+          { time: "11:00 AM", activity: "Visit Lalbagh Botanical Garden" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Visit Bangalore Palace" },
+          { time: "5:00 PM", activity: "Visit Cubbon Park" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 2,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit Auroville - The City of Dawn", icon: "🌞" },
-          { time: "1:00 PM", activity: "Lunch at Auroville", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Visit Matrimandir", icon: "🏛️" },
-          { time: "5:00 PM", activity: "Back to Puducherry", icon: "🚗" },
-          { time: "7:00 PM", activity: "Dinner and overnight stay", icon: "🏨" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit ISKCON Temple" },
+          { time: "11:00 AM", activity: "Visit Nandi Hills" },
+          { time: "1:00 PM", activity: "Lunch at hilltop restaurant" },
+          { time: "3:00 PM", activity: "Visit Wonderla Amusement Park" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
         ]
       },
       {
         day: 3,
         schedule: [
-          { time: "7:00 AM", activity: "Breakfast", icon: "🍳" },
-          { time: "9:00 AM", activity: "Visit White Town and Heritage buildings", icon: "🏛️" },
-          { time: "11:00 AM", activity: "Shopping at Jubilee Market", icon: "🛍️" },
-          { time: "1:00 PM", activity: "Lunch", icon: "🍽️" },
-          { time: "3:00 PM", activity: "Visit Paradise Beach", icon: "🏖️" },
-          { time: "5:00 PM", activity: "Check-out and departure to Chennai", icon: "🚗" }
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Vidhana Soudha" },
+          { time: "11:00 AM", activity: "Visit Tipu Sultan's Palace" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Shopping at Commercial Street" },
+          { time: "5:00 PM", activity: "Check-out and departure" }
         ]
       }
     ],
@@ -573,7 +564,148 @@ const FIXED_PACKAGES = [
     ],
     excludes: [
       "Personal expenses",
-      "Entry fees to attractions",
+      "Entry fees to monuments",
+      "Amusement park tickets",
+      "GST (5%)"
+    ]
+  },
+  {
+    id: 9,
+    name: "Chennai Cultural Tour",
+    destination: "Chennai, Tamil Nadu",
+    days: 4,
+    nights: 3,
+    price: 9500,
+    images: [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
+    description: "Discover the cultural capital of South India with its temples and beaches",
+    itinerary: [
+      {
+        day: 1,
+        schedule: [
+          { time: "9:00 AM", activity: "Pickup from airport/station" },
+          { time: "10:00 AM", activity: "Check-in at hotel" },
+          { time: "11:00 AM", activity: "Visit Marina Beach" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Visit Kapaleeshwarar Temple" },
+          { time: "5:00 PM", activity: "Visit Santhome Cathedral" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
+        ]
+      },
+      {
+        day: 2,
+        schedule: [
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Fort St. George" },
+          { time: "11:00 AM", activity: "Visit St. Mary's Church" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Visit Government Museum" },
+          { time: "5:00 PM", activity: "Visit Valluvar Kottam" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
+        ]
+      },
+      {
+        day: 3,
+        schedule: [
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Mahabalipuram (UNESCO World Heritage Site)" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Visit Pancha Rathas" },
+          { time: "5:00 PM", activity: "Visit Shore Temple" },
+          { time: "7:00 PM", activity: "Back to Chennai" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
+        ]
+      },
+      {
+        day: 4,
+        schedule: [
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Vadapalani Murugan Temple" },
+          { time: "11:00 AM", activity: "Visit Parthasarathy Temple" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Shopping at T. Nagar" },
+          { time: "5:00 PM", activity: "Check-out and departure" }
+        ]
+      }
+    ],
+    includes: [
+      "4 days, 3 nights accommodation",
+      "All meals as per itinerary",
+      "Transportation in AC vehicle",
+      "Sightseeing as per itinerary",
+      "Driver allowance and fuel"
+    ],
+    excludes: [
+      "Personal expenses",
+      "Entry fees to monuments",
+      "Camera charges",
+      "GST (5%)"
+    ]
+  },
+  {
+    id: 10,
+    name: "Hyderabad Heritage & Cuisine",
+    destination: "Hyderabad, Telangana",
+    days: 3,
+    nights: 2,
+    price: 8500,
+    images: [
+      "https://images.unsplash.com/photo-1523880842382-9f8d8a0c1a5a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1561501930-6a605d0b7a9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+    ],
+    description: "Experience the rich heritage and famous cuisine of Hyderabad",
+    itinerary: [
+      {
+        day: 1,
+        schedule: [
+          { time: "9:00 AM", activity: "Pickup from airport/station" },
+          { time: "10:00 AM", activity: "Check-in at hotel" },
+          { time: "11:00 AM", activity: "Visit Charminar" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant (try Hyderabadi biryani)" },
+          { time: "3:00 PM", activity: "Visit Mecca Masjid" },
+          { time: "5:00 PM", activity: "Visit Salar Jung Museum" },
+          { time: "7:00 PM", activity: "Dinner and overnight stay" }
+        ]
+      },
+      {
+        day: 2,
+        schedule: [
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Golconda Fort" },
+          { time: "12:00 PM", activity: "Lunch at local restaurant" },
+          { time: "2:00 PM", activity: "Visit Ramoji Film City" },
+          { time: "6:00 PM", activity: "Shopping at Laad Bazaar" },
+          { time: "8:00 PM", activity: "Dinner and overnight stay" }
+        ]
+      },
+      {
+        day: 3,
+        schedule: [
+          { time: "7:00 AM", activity: "Breakfast" },
+          { time: "9:00 AM", activity: "Visit Birla Mandir" },
+          { time: "11:00 AM", activity: "Visit Hussain Sagar Lake" },
+          { time: "1:00 PM", activity: "Lunch at local restaurant" },
+          { time: "3:00 PM", activity: "Visit Chowmahalla Palace" },
+          { time: "5:00 PM", activity: "Check-out and departure" }
+        ]
+      }
+    ],
+    includes: [
+      "3 days, 2 nights accommodation",
+      "All meals as per itinerary",
+      "Transportation in AC vehicle",
+      "Sightseeing as per itinerary",
+      "Driver allowance and fuel"
+    ],
+    excludes: [
+      "Personal expenses",
+      "Entry fees to monuments",
       "Camera charges",
       "GST (5%)"
     ]
@@ -583,131 +715,113 @@ const FIXED_PACKAGES = [
 export default function FixedVacationPackages() {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [showPackageDetails, setShowPackageDetails] = useState(false);
   const [bookingData, setBookingData] = useState({
     startDate: '',
-    endDate: '',
     passengers: 1,
     vehicleType: 'economy'
   });
 
-  const handleBookPackage = (pkg) => {
+  const handleViewDetails = (pkg) => {
     setSelectedPackage(pkg);
+    setShowPackageDetails(true);
+  };
+
+  const handleBackToPackages = () => {
+    setShowPackageDetails(false);
+    setSelectedPackage(null);
+  };
+
+  const handleBookNow = () => {
     setShowBookingForm(true);
+  };
+
+  const handleCancelBooking = () => {
+    setShowBookingForm(false);
   };
 
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
     
     try {
-      // Calculate end date based on package duration
-      const startDate = new Date(bookingData.startDate);
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + selectedPackage.days);
-      
-      // Prepare vacation data
-      const vacationData = {
+      // Create vacation booking data
+      const bookingData = {
         destination: selectedPackage.destination,
-        hotel_name: "Package Accommodation",
-        hotel_address: selectedPackage.destination,
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
+        start_date: bookingData.startDate,
+        end_date: new Date(new Date(bookingData.startDate).getTime() + (selectedPackage.days - 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         passengers: bookingData.passengers,
         vehicle_type: bookingData.vehicleType,
-        ride_included: true,
-        hotel_included: true,
         total_price: selectedPackage.price,
-        status: "pending",
-        // Add package details to schedule
-        schedule: JSON.stringify({
-          packageName: selectedPackage.name,
-          itinerary: selectedPackage.itinerary,
-          includes: selectedPackage.includes,
-          excludes: selectedPackage.excludes
-        })
+        status: 'pending',
+        hotel_name: selectedPackage.name, // Using package name as hotel name for fixed packages
+        ride_included: true,
+        hotel_included: true
       };
-
-      const response = await vacationService.createVacation(vacationData);
-      alert('Vacation package booked successfully!');
+      
+      // Create the vacation booking
+      const response = await vacationService.createVacation(bookingData);
+      
+      // Schedule rides for the vacation
+      if (response.id) {
+        try {
+          await vacationSchedulerService.scheduleVacationRides(response.id);
+        } catch (scheduleError) {
+          console.error('Failed to schedule vacation rides:', scheduleError);
+        }
+      }
+      
+      alert('Booking submitted successfully! A driver will review your request shortly.');
       setShowBookingForm(false);
-      setBookingData({
-        startDate: '',
-        endDate: '',
-        passengers: 1,
-        vehicleType: 'economy'
-      });
+      setSelectedPackage(null);
     } catch (error) {
-      console.error('Failed to book vacation package:', error);
-      alert('Failed to book vacation package. Please try again.');
+      console.error('Failed to submit booking:', error);
+      alert('Failed to submit booking. Please try again.');
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">Fixed Vacation Packages</h1>
-        <p className="text-center text-gray-600 mb-12">Choose from our curated vacation packages for a hassle-free travel experience</p>
-        
-        {!showBookingForm ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FIXED_PACKAGES.map((pkg) => (
-              <div key={pkg.id} className="card hover:shadow-xl transition-shadow duration-300">
-                <div className="relative">
-                  <img 
-                    src={pkg.image} 
-                    alt={pkg.name} 
-                    className="w-full h-48 object-cover rounded-t-lg"
-                  />
-                  <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-bold">
-                    ₹{pkg.price}
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
-                  <div className="flex items-center text-gray-600 mb-3">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span>{pkg.destination}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      <span>{pkg.days}D/{pkg.nights}N</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 mr-1 text-yellow-500" />
-                      <span>4.8</span>
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-700 mb-4">{pkg.description}</p>
-                  
-                  <button
-                    onClick={() => handleBookPackage(pkg)}
-                    className="w-full btn-primary"
-                  >
-                    Book Now
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
+  // Simple image component for package cards
+  const PackageImage = ({ images, packageName }) => {
+    return (
+      <div className="relative">
+        <img 
+          src={images[0]} 
+          alt={`${packageName}`} 
+          className="w-full h-48 object-cover rounded-t-lg"
+        />
+        <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-bold">
+          ₹{FIXED_PACKAGES.find(p => p.name === packageName)?.price || 0}
+        </div>
+      </div>
+    );
+  };
+
+  // Simple image gallery for package details
+  const PackageImageGallery = ({ images, packageName }) => {
+    return (
+      <div className="mb-6">
+        <img 
+          src={images[0]} 
+          alt={`${packageName}`} 
+          className="w-full h-64 object-cover rounded-lg mb-4"
+        />
+      </div>
+    );
+  };
+
+  if (showBookingForm && selectedPackage) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto card">
-            <h2 className="text-2xl font-bold mb-6">Book {selectedPackage?.name}</h2>
+            <h2 className="text-2xl font-bold mb-6">Book {selectedPackage.name}</h2>
             
-            <div className="mb-6">
-              <img 
-                src={selectedPackage?.image} 
-                alt={selectedPackage?.name} 
-                className="w-full h-64 object-cover rounded-lg mb-4"
-              />
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold">{selectedPackage?.name}</h3>
-                <span className="text-2xl font-bold text-primary-600">₹{selectedPackage?.price}</span>
-              </div>
-              <p className="text-gray-600">{selectedPackage?.destination} • {selectedPackage?.days}D/{selectedPackage?.nights}N</p>
+            <PackageImageGallery images={selectedPackage.images} packageName={selectedPackage.name} />
+            
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">{selectedPackage.name}</h3>
+              <span className="text-2xl font-bold text-primary-600">₹{selectedPackage.price}</span>
             </div>
+            <p className="text-gray-600 mb-6">{selectedPackage.destination} • {selectedPackage.days}D/{selectedPackage.nights}N</p>
             
             <form onSubmit={handleBookingSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -753,7 +867,7 @@ export default function FixedVacationPackages() {
               <div className="flex space-x-4">
                 <button
                   type="button"
-                  onClick={() => setShowBookingForm(false)}
+                  onClick={handleCancelBooking}
                   className="flex-1 btn-outline"
                 >
                   Cancel
@@ -767,34 +881,74 @@ export default function FixedVacationPackages() {
               </div>
             </form>
           </div>
-        )}
-        
-        {selectedPackage && showBookingForm && (
-          <div className="mt-8 card">
-            <h3 className="text-xl font-bold mb-4">Package Itinerary</h3>
-            
-            <div className="space-y-6">
-              {selectedPackage.itinerary.map((day, index) => (
-                <div key={index} className="border-l-4 border-primary-500 pl-4">
-                  <h4 className="text-lg font-bold mb-3">Day {day.day}</h4>
-                  <div className="space-y-3">
-                    {day.schedule.map((item, itemIndex) => (
-                      <div key={itemIndex} className="flex items-start">
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
-                          <span className="text-primary-600 font-bold">{item.time}</span>
-                        </div>
-                        <div>
-                          <p className="font-medium">{item.activity}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (showPackageDetails && selectedPackage) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="mb-6">
+            <button
+              onClick={handleBackToPackages}
+              className="btn-outline"
+            >
+              ← Back to All Packages
+            </button>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="card mb-8">
+              <h2 className="text-2xl font-bold mb-6">{selectedPackage.name}</h2>
+              
+              <PackageImageGallery images={selectedPackage.images} packageName={selectedPackage.name} />
+              
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">{selectedPackage.name}</h3>
+                <span className="text-2xl font-bold text-primary-600">₹{selectedPackage.price}</span>
+              </div>
+              <p className="text-gray-600 mb-6">{selectedPackage.destination} • {selectedPackage.days}D/{selectedPackage.nights}N</p>
+              
+              <p className="text-gray-700 mb-6">{selectedPackage.description}</p>
+              
+              <div className="flex space-x-4 mb-8">
+                <button
+                  onClick={handleBookNow}
+                  className="flex-1 btn-primary"
+                >
+                  Book Now
+                </button>
+              </div>
             </div>
             
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+            <div className="card mb-8">
+              <h3 className="text-xl font-bold mb-4">Package Itinerary</h3>
+              
+              <div className="space-y-6">
+                {selectedPackage.itinerary.map((day, index) => (
+                  <div key={index} className="border-l-4 border-primary-500 pl-4">
+                    <h4 className="text-lg font-bold mb-3">Day {day.day}</h4>
+                    <div className="space-y-3">
+                      {day.schedule.map((item, itemIndex) => (
+                        <div key={itemIndex} className="flex items-start">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
+                            <span className="text-primary-600 font-bold">{item.time}</span>
+                          </div>
+                          <div>
+                            <p className="font-medium">{item.activity}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="card">
                 <h4 className="text-lg font-bold mb-3">Includes</h4>
                 <ul className="space-y-2">
                   {selectedPackage.includes.map((item, index) => (
@@ -806,7 +960,7 @@ export default function FixedVacationPackages() {
                 </ul>
               </div>
               
-              <div>
+              <div className="card">
                 <h4 className="text-lg font-bold mb-3">Excludes</h4>
                 <ul className="space-y-2">
                   {selectedPackage.excludes.map((item, index) => (
@@ -819,7 +973,53 @@ export default function FixedVacationPackages() {
               </div>
             </div>
           </div>
-        )}
+        </div>
+      </div>
+    );
+  }
+
+  // Show all packages
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <h1 className="text-3xl font-bold text-center mb-8">Fixed Vacation Packages</h1>
+        <p className="text-center text-gray-600 mb-12">Choose from our curated vacation packages for a hassle-free travel experience</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {FIXED_PACKAGES.map((pkg) => (
+            <div key={pkg.id} className="card hover:shadow-xl transition-shadow duration-300">
+              <PackageImage images={pkg.images} packageName={pkg.name} />
+              
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
+                <div className="flex items-center text-gray-600 mb-3">
+                  <MapPin className="w-4 h-4 mr-1" />
+                  <span>{pkg.destination}</span>
+                </div>
+                
+                <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
+                  <div className="flex items-center">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    <span>{pkg.days}D/{pkg.nights}N</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Star className="w-4 h-4 mr-1 text-yellow-500" />
+                    <span>4.8</span>
+                  </div>
+                </div>
+                
+                <p className="text-gray-700 mb-4">{pkg.description}</p>
+                
+                <button
+                  onClick={() => handleViewDetails(pkg)}
+                  className="w-full btn-primary"
+                >
+                  View Details
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

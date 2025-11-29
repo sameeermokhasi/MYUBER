@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plane, Hotel, Car, Calendar, Users, MapPin, DollarSign, Award, LogOut, Check, Clock, Utensils } from 'lucide-react'
+import { Plane, Hotel, Car, Calendar, Users, MapPin, DollarSign, Award, LogOut, Check, Clock, Utensils, History } from 'lucide-react'
 import { vacationService } from '../services/api'
 import { useAuthStore } from '../store/authStore'
 import FixedVacationPackages from '../components/FixedVacationPackages';
@@ -139,7 +139,25 @@ export default function VacationBooking() {
 
         {/* My Vacations */}
         <div className="card">
-          <h2 className="text-2xl font-bold mb-6">My Vacation Bookings</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">My Vacation Bookings</h2>
+            <button 
+              onClick={() => {
+                // Filter to show only completed vacations
+                const completedVacations = vacations.filter(v => v.status === 'completed');
+                // For now, we'll just show an alert, but in a real app this would open a modal
+                if (completedVacations.length > 0) {
+                  alert(`You have ${completedVacations.length} completed vacations. In a real app, this would open a detailed view.`);
+                } else {
+                  alert('You have no completed vacations yet.');
+                }
+              }}
+              className="btn-primary flex items-center"
+            >
+              <History className="w-4 h-4 mr-2" />
+              Recent Vacations Completed
+            </button>
+          </div>
 
           {loading ? (
             <div className="text-center py-12">
@@ -219,8 +237,8 @@ export default function VacationBooking() {
 
                     <div className="flex justify-between items-center">
                       <div className="flex items-center">
-                        <DollarSign className="w-5 h-5 text-green-600" />
-                        <span className="text-xl font-bold">{vacation.total_price?.toFixed(2)}</span>
+                        <span className="text-lg font-bold text-green-600 mr-1">₹</span>
+                        <span className="text-xl font-bold">{vacation.total_price?.toFixed(2) || '0.00'}</span>
                       </div>
                       <div className="flex space-x-2">
                         {vacation.status === 'pending' && (

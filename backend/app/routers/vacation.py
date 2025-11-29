@@ -267,7 +267,7 @@ async def cancel_vacation(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Cancel a vacation booking"""
+    """Cancel a vacation booking with 70% refund to wallet"""
     vacation = db.query(Vacation).filter(Vacation.id == vacation_id).first()
     
     if not vacation:
@@ -288,10 +288,22 @@ async def cancel_vacation(
             detail="Cannot cancel past vacations"
         )
     
-    vacation.status = "cancelled"
-    db.commit()
+    # Calculate 70% refund amount
+    refund_amount = vacation.total_price * 0.7
     
-    return {"message": "Vacation booking cancelled successfully"}
+    # Update user's wallet balance
+    current_user.wallet_balance = (current_user.wallet_balance or 0) + refund_amount
+    
+    # Update vacation status
+    vacation.status = "cancelled"
+    
+    db.commit()
+    db.refresh(current_user)
+    
+    return {
+        "message": f"Vacation booking cancelled successfully. ₹{refund_amount:.2f} has been refunded to your wallet.",
+        "refund_amount": refund_amount
+    }
 
 @router.patch("/{vacation_id}/confirm")
 async def confirm_vacation(
@@ -301,7 +313,7 @@ async def confirm_vacation(
 ):
     """Confirm a vacation booking (driver action)"""
     # Only drivers and admins can confirm bookings
-    if str(current_user.role) not in [UserRole.DRIVER.value, UserRole.ADMIN.value]:
+    if current_user.role != UserRole.DRIVER and current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only drivers and admins can confirm vacation bookings"
@@ -333,6 +345,13 @@ async def confirm_vacation(
             "vacation_id": vacation.id,
             "status": "confirmed"
         }, int(vacation.user_id) if vacation.user_id is not None else 0)
+        
+        # Also notify the driver who confirmed it
+        await manager.send_personal_message({
+            "type": "vacation_status_update",
+            "vacation_id": vacation.id,
+            "status": "confirmed"
+        }, int(current_user.id) if current_user.id is not None else 0)
     except Exception as e:
         print(f"Failed to send WebSocket notification to rider: {e}")
     
@@ -346,7 +365,7 @@ async def reject_vacation(
 ):
     """Reject a vacation booking (driver action)"""
     # Only drivers and admins can reject bookings
-    if str(current_user.role) not in [UserRole.DRIVER.value, UserRole.ADMIN.value]:
+    if current_user.role != UserRole.DRIVER and current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only drivers and admins can reject vacation bookings"
@@ -379,6 +398,13 @@ async def reject_vacation(
             "vacation_id": vacation.id,
             "status": "rejected"
         }, int(vacation.user_id) if vacation.user_id is not None else 0)
+        
+        # Also notify the driver who rejected it
+        await manager.send_personal_message({
+            "type": "vacation_status_update",
+            "vacation_id": vacation.id,
+            "status": "rejected"
+        }, int(current_user.id) if current_user.id is not None else 0)
     except Exception as e:
         print(f"Failed to send WebSocket notification to rider: {e}")
     

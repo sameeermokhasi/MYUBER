@@ -147,7 +147,7 @@ async def toggle_driver_availability(
         driver_profile = DriverProfile(
             user_id=current_user.id,
             license_number=f"LIC{current_user.id:06d}",  # Generate a default license number
-            is_available=True
+            is_available=True  # Set to available by default
         )
         db.add(driver_profile)
         try:
@@ -160,14 +160,14 @@ async def toggle_driver_availability(
             )
         db.refresh(driver_profile)
     
-    # Toggle availability
-    driver_profile.is_available = not driver_profile.is_available
+    # Always set to available when this endpoint is called
+    driver_profile.is_available = True
     
     try:
         db.commit()
         db.refresh(driver_profile)
         db.refresh(current_user)
-        print(f"Driver {current_user.id} availability toggled to: {driver_profile.is_available}")
+        print(f"Driver {current_user.id} availability set to: {driver_profile.is_available}")
     except Exception as e:
         db.rollback()
         raise HTTPException(

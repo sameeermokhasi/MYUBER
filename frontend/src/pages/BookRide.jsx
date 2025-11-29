@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { MapPin, DollarSign, Car, Clock, ArrowLeft } from 'lucide-react'
 import { rideService } from '../services/api'
 import MapWithRoute from '../components/MapWithRoute'
+import { useAuthStore } from '../store/authStore'
 
 export default function BookRide() {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
   const [formData, setFormData] = useState({
     pickup_address: '',
     pickup_lat: 0,
@@ -19,6 +21,20 @@ export default function BookRide() {
   const [loading, setLoading] = useState(false)
   const [mapRouteInfo, setMapRouteInfo] = useState(null)
   const [popularLocations, setPopularLocations] = useState([])
+  const [penaltyAmount, setPenaltyAmount] = useState(0)
+  
+  // Autocomplete states
+  const [pickupSuggestions, setPickupSuggestions] = useState([])
+  const [destinationSuggestions, setDestinationSuggestions] = useState([])
+  const [showPickupSuggestions, setShowPickupSuggestions] = useState(false)
+  const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false)
+
+  // Check for penalties when component mounts
+  useEffect(() => {
+    if (user && user.consecutive_cancellations > 2) {
+      setPenaltyAmount(100)
+    }
+  }, [user])
 
   // Sample locations for demo (Indian cities and local areas)
   const sampleLocations = [
@@ -30,9 +46,29 @@ export default function BookRide() {
     { name: 'Chennai', lat: 13.0827, lng: 80.2707 },
     { name: 'Hyderabad', lat: 17.3850, lng: 78.4867 },
     
-    // Popular Local Areas
+    // Bangalore Local Areas
     { name: 'Indiranagar, Bangalore', lat: 12.9719, lng: 77.6412 },
     { name: 'Koramangala, Bangalore', lat: 12.9352, lng: 77.6245 },
+    { name: 'Whitefield, Bangalore', lat: 12.9698, lng: 77.7500 },
+    { name: 'HSR Layout, Bangalore', lat: 12.9109, lng: 77.6542 },
+    { name: 'Jayanagar, Bangalore', lat: 12.9250, lng: 77.5938 },
+    { name: 'Malleshwaram, Bangalore', lat: 13.0047, lng: 77.5755 },
+    { name: 'Electronic City, Bangalore', lat: 12.8391, lng: 77.6774 },
+    { name: 'Marathahalli, Bangalore', lat: 12.9507, lng: 77.7000 },
+    { name: 'BTM Layout, Bangalore', lat: 12.9166, lng: 77.6104 },
+    { name: 'Bannerghatta, Bangalore', lat: 12.8572, lng: 77.5996 },
+    { name: 'Yeshwantpur, Bangalore', lat: 13.0291, lng: 77.5305 },
+    { name: 'Hebbal, Bangalore', lat: 13.0340, lng: 77.5959 },
+    { name: 'Frazer Town, Bangalore', lat: 12.9955, lng: 77.6192 },
+    { name: 'Richmond Town, Bangalore', lat: 12.9602, lng: 77.5964 },
+    { name: 'Basavanagudi, Bangalore', lat: 12.9348, lng: 77.5721 },
+    { name: 'Peenya, Bangalore', lat: 13.0291, lng: 77.5147 },
+    { name: 'Rajajinagar, Bangalore', lat: 12.9956, lng: 77.5500 },
+    { name: 'Kengeri, Bangalore', lat: 12.9166, lng: 77.4881 },
+    { name: 'JP Nagar, Bangalore', lat: 12.9069, lng: 77.5891 },
+    { name: 'MG Road, Bangalore', lat: 12.9762, lng: 77.5998 },
+    
+    // Other City Popular Areas
     { name: 'Connaught Place, Delhi', lat: 28.6333, lng: 77.2250 },
     { name: 'Gurgaon, Delhi NCR', lat: 28.4595, lng: 77.0266 },
     { name: 'Bandra, Mumbai', lat: 19.0596, lng: 72.8381 },
@@ -42,6 +78,66 @@ export default function BookRide() {
     { name: 'HITEC City, Hyderabad', lat: 17.4448, lng: 78.3852 },
     { name: 'Jubilee Hills, Hyderabad', lat: 17.4250, lng: 78.4000 }
   ]
+  
+  // Filter locations based on search input
+  const getSuggestions = (input) => {
+    if (!input || input.length < 1) return []
+    const searchTerm = input.toLowerCase()
+    return sampleLocations.filter(location => 
+      location.name.toLowerCase().includes(searchTerm)
+    ).slice(0, 8) // Limit to 8 suggestions
+  }
+  
+  // Handle input change for autocomplete
+  const handleInputChange = (field, value) => {
+    if (field === 'pickup') {
+      setFormData({ ...formData, pickup_address: value })
+      const suggestions = getSuggestions(value)
+      setPickupSuggestions(suggestions)
+      setShowPickupSuggestions(suggestions.length > 0 && value.length > 0)
+    } else {
+      setFormData({ ...formData, destination_address: value })
+      const suggestions = getSuggestions(value)
+      setDestinationSuggestions(suggestions)
+      setShowDestinationSuggestions(suggestions.length > 0 && value.length > 0)
+    }
+  }
+  
+  // Handle suggestion selection
+  const handleSuggestionSelect = (field, location) => {
+    if (field === 'pickup') {
+      setFormData({
+        ...formData,
+        pickup_address: location.name,
+        pickup_lat: location.lat,
+        pickup_lng: location.lng
+      })
+      setShowPickupSuggestions(false)
+    } else {
+      setFormData({
+        ...formData,
+        destination_address: location.name,
+        destination_lat: location.lat,
+        destination_lng: location.lng
+      })
+      setShowDestinationSuggestions(false)
+    }
+  }
+  
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.autocomplete-container')) {
+        setShowPickupSuggestions(false)
+        setShowDestinationSuggestions(false)
+      }
+    }
+    
+    document.addEventListener('click', handleClickOutside)
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   const handleLocationSelect = (field, location) => {
     if (field === 'pickup') {
@@ -184,64 +280,68 @@ export default function BookRide() {
             <div className="md:col-span-2">
               <form onSubmit={handleSubmit} className="card space-y-6">
                 {/* Pickup Location */}
-                <div>
+                <div className="autocomplete-container">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <MapPin className="w-4 h-4 inline text-green-600 mr-1" />
                     Pickup Location
                   </label>
-                  <input
-                    type="text"
-                    value={formData.pickup_address}
-                    onChange={(e) => setFormData({ ...formData, pickup_address: e.target.value })}
-                    className="input-field"
-                    placeholder="Enter pickup location"
-                    required
-                  />
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500 mb-2">Popular locations:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {sampleLocations.map((loc, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleLocationSelect('pickup', loc)}
-                          className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition-colors"
-                        >
-                          {loc.name}
-                        </button>
-                      ))}
-                    </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={formData.pickup_address}
+                      onChange={(e) => handleInputChange('pickup', e.target.value)}
+                      onFocus={() => setShowPickupSuggestions(getSuggestions(formData.pickup_address).length > 0)}
+                      className="input-field w-full"
+                      placeholder="Enter pickup location"
+                      required
+                    />
+                    {showPickupSuggestions && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {pickupSuggestions.map((location, index) => (
+                          <div
+                            key={index}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                            onClick={() => handleSuggestionSelect('pickup', location)}
+                          >
+                            <MapPin className="w-4 h-4 text-green-600 mr-2" />
+                            <span>{location.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Destination */}
-                <div>
+                <div className="autocomplete-container">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <MapPin className="w-4 h-4 inline text-red-600 mr-1" />
                     Destination
                   </label>
-                  <input
-                    type="text"
-                    value={formData.destination_address}
-                    onChange={(e) => setFormData({ ...formData, destination_address: e.target.value })}
-                    className="input-field"
-                    placeholder="Where to?"
-                    required
-                  />
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500 mb-2">Popular locations:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {sampleLocations.map((loc, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleLocationSelect('destination', loc)}
-                          className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition-colors"
-                        >
-                          {loc.name}
-                        </button>
-                      ))}
-                    </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={formData.destination_address}
+                      onChange={(e) => handleInputChange('destination', e.target.value)}
+                      onFocus={() => setShowDestinationSuggestions(getSuggestions(formData.destination_address).length > 0)}
+                      className="input-field w-full"
+                      placeholder="Where to?"
+                      required
+                    />
+                    {showDestinationSuggestions && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {destinationSuggestions.map((location, index) => (
+                          <div
+                            key={index}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                            onClick={() => handleSuggestionSelect('destination', location)}
+                          >
+                            <MapPin className="w-4 h-4 text-red-600 mr-2" />
+                            <span>{location.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -320,6 +420,12 @@ export default function BookRide() {
                       <p className="text-3xl font-bold text-primary-600">
                         ₹{estimatedFare.fare}
                       </p>
+                      {penaltyAmount > 0 && (
+                        <div className="mt-2 text-sm">
+                          <p className="text-red-600">⚠️ Penalty: ₹{penaltyAmount}</p>
+                          <p className="font-bold">Total: ₹{(parseFloat(estimatedFare.fare) + penaltyAmount).toFixed(2)}</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-2 text-sm">
@@ -349,6 +455,14 @@ export default function BookRide() {
                         </>
                       )}
                     </div>
+
+                    {penaltyAmount > 0 && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <p className="text-sm text-red-700">
+                          ⚠️ You have cancelled more than 2 rides consecutively. A penalty of ₹{penaltyAmount} will be applied to this ride.
+                        </p>
+                      </div>
+                    )}
 
                     <div className="border-t border-gray-200 pt-3 mt-3">
                       <p className="text-xs text-gray-500">
