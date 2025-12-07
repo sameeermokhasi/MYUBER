@@ -1,0 +1,16 @@
+=== STARTING SYSTEM DEBUG ===
+Health Check: 200 {'status': 'healthy'}
+Registering rider: user_ecqlln@example.com
+Registering driver: user_rdpxct@example.com
+Setting driver location (Bangalore)...
+Location Update: 200
+Availability Toggle: 200
+Creating Ride Request...
+Create Ride Status: 201
+Ride Created: ID 83
+Ride Inspection: {'id': 83, 'rider_id': 85, 'driver_id': None, 'vacation_id': None, 'pickup_address': 'Cubbon Park, Bangalore', 'pickup_lat': 12.975, 'pickup_lng': 77.59, 'destination_address': 'Indiranagar, Bangalore', 'destination_lat': 12.978, 'destination_lng': 77.64, 'status': 'pending', 'vehicle_type': 'economy', 'distance_km': 5.428022990556002, 'duration_minutes': 8, 'estimated_fare': 104.28022990556002, 'final_fare': None, 'rating': None, 'feedback': None, 'scheduled_time': None, 'created_at': '2025-12-04T15:09:22', 'started_at': None, 'completed_at': None, 'rider': {'email': 'user_ecqlln@example.com', 'name': 'Test Rider', 'phone': '0179087125', 'id': 85, 'role': 'rider', 'is_active': True, 'is_verified': False, 'profile_picture': None, 'wallet_balance': 0.0, 'address': None, 'created_at': '2025-12-04T15:09:09'}, 'driver': None}
+Fetching Available Rides for Driver...
+Attempt 1: Found 0 rides
+Attempt 2: Found 0 rides
+Attempt 3: Found 0 rides
+FAILURE: Ride NOT visible to driver.
